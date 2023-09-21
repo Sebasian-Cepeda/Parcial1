@@ -10,7 +10,13 @@ public class PiDigits {
 
     private static int DigitsPerSum = 8;
     private static double Epsilon = 1e-17;
+    private static int start,count,N;
 
+    public PiDigits(int start,int count){
+        this.N = N;
+        this.start = start;
+        this.count = count;
+    }
     
     /**
      * Returns a range of hexadecimal digits of pi.
@@ -18,7 +24,23 @@ public class PiDigits {
      * @param count The number of digits to return
      * @return An array containing the hexadecimal digits.
      */
+    public static byte[] getDigits(int start, int count, int N) {
+       
+        ParcialThread[] pts = new ParcialThread[N];
+        for(int i = 0; i<N;i++){
+            pts[i] = new ParcialThread(new PiDigits(start, count));
+            pts[i].start();
+            byte[] digits = pts[i].gePiDigits().getDigits(start, count);
+            start = count;
+            count += (count+start)/N;
+        }
+        byte[] digits = new byte[count];
+        return digits;
+    }
+
     public static byte[] getDigits(int start, int count) {
+       
+
         if (start < 0) {
             throw new RuntimeException("Invalid Interval");
         }
@@ -108,6 +130,10 @@ public class PiDigits {
         }
 
         return result;
+    }
+
+    public int getN(){
+        return this.N;
     }
 
 }
