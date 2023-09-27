@@ -5,7 +5,6 @@
  */
 package edu.eci.arsw.math;
 
-import java.util.Arrays;
 
 /**
  *
@@ -14,9 +13,27 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String a[]) {
-        System.out.println(bytesToHex(PiDigits.getDigits(0, 10)));
-        System.out.println(bytesToHex(PiDigits.getDigits(1, 100)));
-        System.out.println(bytesToHex(PiDigits.getDigits(1, 1000000)));
+        System.out.println(bytesToHex(PiDigits.getDigits(0, 9,1)));
+        // System.out.println(bytesToHex(PiDigits.getDigits(10, 19)));
+        // System.out.println(bytesToHex(PiDigits.getDigits(20, 29)));
+
+
+
+
+        // ParcialThread p = new ParcialThread(0,9);
+        // p.start();
+
+        
+        // try {
+        //     p.sleep(10);
+        //     System.out.println(bytesToHex(p.getDigits()));
+        // } catch (InterruptedException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
+
+        
+        
     }
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();

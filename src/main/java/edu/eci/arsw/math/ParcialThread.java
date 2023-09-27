@@ -1,42 +1,135 @@
 package edu.eci.arsw.math;
 
 public class ParcialThread extends Thread {
-    private int a,b;
-    private Long startTime;
-    private Object lock = new Object();
-    private PiDigits piDigits;
+    
+    private static int DigitsPerSum = 8;
+    private static double Epsilon = 1e-17;
+    private int ini, fin;
     private byte[] digits;
 
-    public ParcialThread(PiDigits piDigits) {
+    public ParcialThread(int ini, int fin) {
         super();
-        this.a = a;
-        this.b = b;
-        this.piDigits = piDigits;
+        this.ini = ini;
+        this.fin = fin;
+        this.digits = new byte[fin];
     }
 
     @Override
     public void run() {
-        while (true) {
-            this.startTime = System.currentTimeMillis();
-            long targetPauseTime = startTime + 1000;
 
-            synchronized (lock) {
-                digits  = piDigits.getDigits(a, b);
+        double sum = 0;
+
+        for (int i = 0; i < this.fin; i++) {
+            if (i % DigitsPerSum == 0) {
+                sum = 4 * sum(1, this.ini)
+                        - 2 * sum(4, this.ini)
+                        - sum(5, this.ini)
+                        - sum(6, this.ini);
+
+                this.ini += DigitsPerSum;
             }
 
-            if (System.currentTimeMillis() >= targetPauseTime) {
-                try {
-                    System.out.println("");
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            sum = 16 * (sum - Math.floor(sum));
+            this.digits[i] = (byte) sum;
+        }
+
+    }
+
+    /**
+     * Returns a range of hexadecimal digits of pi.
+     * 
+     * @param start The starting location of the range.
+     * @param count The number of digits to return
+     * @return An array containing the hexadecimal digits.
+     */
+    public static byte[] getDigits(int start, int count) {
+
+        byte[] digits = new byte[count];
+        double sum = 0;
+
+        for (int i = 0; i < count; i++) {
+            if (i % DigitsPerSum == 0) {
+                sum = 4 * sum(1, start)
+                        - 2 * sum(4, start)
+                        - sum(5, start)
+                        - sum(6, start);
+
+                start += DigitsPerSum;
+            }
+
+            sum = 16 * (sum - Math.floor(sum));
+            digits[i] = (byte) sum;
+
+        }
+        return digits;
+
+    }
+
+    /// <summary>
+    /// Returns the sum of 16^(n - k)/(8 * k + m) from 0 to k.
+    /// </summary>
+    /// <param name="m"></param>
+    /// <param name="n"></param>
+    /// <returns></returns>
+    private static double sum(int m, int n) {
+        double sum = 0;
+        int d = m;
+        int power = n;
+
+        while (true) {
+            double term;
+
+            if (power > 0) {
+                term = (double) hexExponentModulo(power, d) / d;
+            } else {
+                term = Math.pow(16, power) / d;
+                if (term < Epsilon) {
+                    break;
                 }
             }
+
+            sum += term;
+            power--;
+            d += 8;
         }
+
+        return sum;
     }
 
-    public PiDigits gePiDigits(){
-        return this.piDigits;
+    /// <summary>
+    /// Return 16^p mod m.
+    /// </summary>
+    /// <param name="p"></param>
+    /// <param name="m"></param>
+    /// <returns></returns>
+    private static int hexExponentModulo(int p, int m) {
+        int power = 1;
+        while (power * 2 <= p) {
+            power *= 2;
+        }
+
+        int result = 1;
+
+        while (power > 0) {
+            if (p >= power) {
+                result *= 16;
+                result %= m;
+                p -= power;
+            }
+
+            power /= 2;
+
+            if (power > 0) {
+                result *= result;
+                result %= m;
+            }
+        }
+
+        return result;
     }
-    
+
+    public byte[] getDigits(){
+        return this.digits;
+    }
+
 }
